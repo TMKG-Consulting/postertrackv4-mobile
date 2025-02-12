@@ -3,16 +3,22 @@ import { Pressable, View } from "react-native";
 import AppText from "../../shared/AppText";
 import AppButton from "../../shared/AppButton";
 import { router } from "expo-router";
+import useRootStore from "@/src/hooks/stores/useRootstore";
 
 export default function HomeScreen() {
 	const [action, setAction] = useState<"compliance" | "competitive">(
 		"compliance"
 	);
 
+	const { userDetails } = useRootStore();
+
 	return (
 		<View className="flex-1 bg-white px-[15px]">
-			<AppText weight="ExtraBold" className="text-[30px] text-bgBlack">
-				Hello John,
+			<AppText
+				numberOfLines={1}
+				weight="ExtraBold"
+				className="text-[30px] text-bgBlack max-w-[70%]">
+				Hello {userDetails?.firstname},
 			</AppText>
 			<AppText weight="Regular" className="text-[20px] text-textGray">
 				What are you doing today ?

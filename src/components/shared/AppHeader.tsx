@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Hamburger from "@/src/assets/images/Hamburger.svg";
 import NotificationIcon from "@/src/assets/images/NotificationIcon.svg";
@@ -8,6 +8,7 @@ import { DrawerHeaderProps } from "@react-navigation/drawer";
 import { shadowStyles } from "@/src/constants/stylesheets";
 import { router, usePathname } from "expo-router";
 import AppText from "./AppText";
+import { Pressable } from "react-native-gesture-handler";
 
 export default function AppHeader(props: DrawerHeaderProps) {
 	const { top } = useSafeAreaInsets();
@@ -21,25 +22,37 @@ export default function AppHeader(props: DrawerHeaderProps) {
 			<View style={{ paddingTop: top }}></View>
 			<View className=" w-full items-center flex-row justify-between h-[80px]">
 				{isHome && (
-					<Pressable
+					<View
 						style={shadowStyles.shadow}
-						onPress={() => navigation.toggleDrawer()}
 						className="w-[45px] h-[45px] rounded-full bg-white items-center justify-center">
-						<Hamburger />
-					</Pressable>
+						<Pressable onPress={() => navigation.toggleDrawer()}>
+							<Hamburger />
+						</Pressable>
+					</View>
 				)}
 				{!isHome && (
 					<Pressable
-						style={shadowStyles.shadow}
+						style={[
+							shadowStyles.shadow,
+							{
+								width: 45,
+								height: 45,
+								borderRadius: 100,
+								backgroundColor: "white",
+								alignItems: "center",
+								justifyContent: "center",
+							},
+						]}
 						onPress={() => {
 							if (router.canGoBack()) {
 								router.back();
 							} else {
 								router.push("/home");
 							}
-						}}
-						className="w-[45px] h-[45px] rounded-full bg-white items-center justify-center rotate-[90deg]">
-						<ChevronIcon fill={"black"} />
+						}}>
+						<View style={{ transform: [{ rotate: "90deg" }] }}>
+							<ChevronIcon fill={"black"} />
+						</View>
 					</Pressable>
 				)}
 				<AppText className="text-[22px]" weight="SemiBold">

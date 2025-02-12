@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, View, TouchableOpacity } from "react-native";
+import { Pressable, View } from "react-native";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
 import CloseIcon from "@/src/assets/images/XIcon.svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -7,6 +7,7 @@ import { Link } from "expo-router";
 import AppText from "./AppText";
 import Avatar from "./Avatar";
 import { shadowStyles } from "@/src/constants/stylesheets";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default function DrawerContent(props: DrawerContentComponentProps) {
 	const { top } = useSafeAreaInsets();
@@ -14,14 +15,14 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
 	return (
 		<View className="flex-1 px-[15px]">
 			<View style={{ height: top + 30 }}></View>
-			<View>
+			<View
+				style={shadowStyles.shadow}
+				className="w-[45px] h-[45px] items-center justify-center bg-white rounded-full">
 				<TouchableOpacity
 					onPress={() => {
 						props.navigation.closeDrawer();
-					}}
-					style={shadowStyles.shadow}
-					className="w-[45px] h-[45px] items-center justify-center bg-white rounded-full">
-					<CloseIcon />
+					}}>
+					<CloseIcon fill={"#000000"} />
 				</TouchableOpacity>
 			</View>
 			<View className="mt-[30px] gap-y-[25px]">
@@ -41,8 +42,8 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
 				</Link>
 			</View>
 			<Link asChild href={"/"}>
-				<TouchableOpacity className="mt-[30px] pt-[15px] border-t border-t-[#D1D1D1]">
-					<View className="flex-row items-center justify-between">
+				<TouchableOpacity>
+					<View className="flex-row items-center justify-between mt-[30px] pt-[15px] border-t border-t-[#D1D1D1]">
 						<View className="flex-row items-center gap-x-[10px]">
 							<Avatar
 								size={50}

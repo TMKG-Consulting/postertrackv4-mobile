@@ -15,7 +15,14 @@
 			"adaptiveIcon": {
 				"foregroundImage": "./src/assets/images/poster-track-logo.png",
 				"backgroundColor": "#140100"
-			}
+			},
+			"permissions": [
+				"android.permission.ACCESS_COARSE_LOCATION",
+				"android.permission.ACCESS_FINE_LOCATION",
+				"android.permission.ACCESS_BACKGROUND_LOCATION",
+				"android.permission.RECORD_AUDIO",
+				"android.permission.CAMERA"
+			]
 		},
 		"web": {
 			"bundler": "metro",
@@ -31,6 +38,20 @@
 					"imageWidth": 100,
 					"resizeMode": "contain",
 					"backgroundColor": "#140100"
+				}
+			],
+			"expo-secure-store",
+			[
+				"expo-location",
+				{
+					"locationAlwaysAndWhenInUsePermission": "Sharing your location allows us to track new audits upload process."
+				}
+			],
+			[
+				"expo-image-picker",
+				{
+					"photosPermission": "We need to access your photos to let you upload your audit images/video.",
+					"cameraPermission": "We need to access your camera to let you upload your audit images/video."
 				}
 			]
 		],

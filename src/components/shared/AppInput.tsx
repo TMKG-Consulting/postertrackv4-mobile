@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { Pressable, TextInput, StyleSheet } from "react-native";
+import {
+	Pressable,
+	TextInput,
+	StyleSheet,
+	KeyboardTypeOptions,
+} from "react-native";
 import { View } from "react-native";
 import AppText from "./AppText";
 import Eye from "@/src/assets/images/Eye.svg";
@@ -11,6 +16,9 @@ type Props = {
 	errorMessage?: string;
 	fullyRounded?: boolean;
 	value?: string | number;
+	keyboardType?: KeyboardTypeOptions;
+	secureTextEntry?: boolean;
+	onChange?: (val: string) => void;
 };
 
 export default function AppInput({
@@ -19,6 +27,9 @@ export default function AppInput({
 	errorMessage,
 	fullyRounded,
 	value = "",
+	secureTextEntry,
+	onChange,
+	keyboardType,
 }: Props) {
 	return (
 		<View className="w-full gap-y-[10px]">
@@ -30,9 +41,15 @@ export default function AppInput({
 					fullyRounded ? "rounded-full" : "rounded-[10px]"
 				} focus:border-primary border-[1.5px] border-transparent text-[15px]`}
 				placeholder={placeholder}
-				keyboardType="email-address"
 				value={String(value)}
 				style={styles.input}
+				keyboardType={keyboardType}
+				secureTextEntry={secureTextEntry}
+				onChangeText={(text) => {
+					if (onChange) {
+						onChange(text);
+					}
+				}}
 			/>
 			{errorMessage && (
 				<AppText className="text-[13px] text-red-500" weight="Regular">
@@ -49,6 +66,7 @@ AppInput.ForPassword = ({
 	errorMessage,
 	fullyRounded,
 	value = "",
+	onChange,
 }: Props) => {
 	const [focused, setFocused] = useState(false);
 	const [showText, setShowText] = useState(false);
@@ -73,6 +91,12 @@ AppInput.ForPassword = ({
 					autoCapitalize="none"
 					value={String(value)}
 					style={styles.input}
+					keyboardType={"default"}
+					onChangeText={(text) => {
+						if (onChange) {
+							onChange(text);
+						}
+					}}
 				/>
 				<Pressable
 					className="w-[30px] h-full items-center justify-center"
@@ -90,8 +114,48 @@ AppInput.ForPassword = ({
 	);
 };
 
+AppInput.TextArea = ({
+	label,
+	placeholder,
+	errorMessage,
+	fullyRounded,
+	value = "",
+	secureTextEntry,
+	onChange,
+	keyboardType,
+}: Props) => {
+	return (
+		<View className="w-full gap-y-[10px]">
+			<AppText className="text-[16px] text-textBlack" weight="Medium">
+				{label}
+			</AppText>
+			<TextInput
+				className={`bg-white h-[150px] p-3 ${
+					fullyRounded ? "rounded-full" : "rounded-[10px]"
+				} focus:border-primary border-[1.5px] border-transparent text-[15px]`}
+				placeholder={placeholder}
+				value={String(value)}
+				style={styles.input}
+				keyboardType={keyboardType}
+				secureTextEntry={secureTextEntry}
+				onChangeText={(text) => {
+					if (onChange) {
+						onChange(text);
+					}
+				}}
+				textAlignVertical="top"
+			/>
+			{errorMessage && (
+				<AppText className="text-[13px] text-red-500" weight="Regular">
+					{errorMessage}
+				</AppText>
+			)}
+		</View>
+	);
+};
+
 const styles = StyleSheet.create({
 	input: {
-		fontFamily: "SoraRegular",
+		fontFamily: "CatamaranRegular",
 	},
 });

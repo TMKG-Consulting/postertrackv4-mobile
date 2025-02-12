@@ -9,13 +9,12 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
 import useRootStore from "../hooks/stores/useRootstore";
 import "../../globals.css";
+import Alert from "../components/shared/Alert";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
 SplashScreen.preventAutoHideAsync();
 
-// SplashScreen.setOptions({
-// 	duration: 1000,
-// 	fade: true,
-// });
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
 	const [loaded] = useFonts({
@@ -34,7 +33,7 @@ export default function RootLayout() {
 
 	useEffect(() => {
 		const lightRoutes = ["/auth/welcome", "/"];
-		
+
 		if (lightRoutes.includes(pathname)) {
 			setStatusBarStyle("light");
 		} else {
@@ -53,12 +52,15 @@ export default function RootLayout() {
 	}
 
 	return (
-		<SafeAreaProvider style={{ backgroundColor: "#140100" }}>
-			<GestureHandlerRootView>
-				<StatusBar style={statusBarStyle} />
-				<View onLayout={onLayoutRootView}></View>
-				<Slot />
-			</GestureHandlerRootView>
-		</SafeAreaProvider>
+		<QueryClientProvider client={queryClient}>
+			<SafeAreaProvider style={{ backgroundColor: "#140100" }}>
+				<GestureHandlerRootView>
+					<Alert />
+					<StatusBar style={statusBarStyle} />
+					<View onLayout={onLayoutRootView}></View>
+					<Slot />
+				</GestureHandlerRootView>
+			</SafeAreaProvider>
+		</QueryClientProvider>
 	);
 }

@@ -1,31 +1,34 @@
 import React from "react";
-import { ScrollView, TouchableOpacity, View } from "react-native";
+import { Pressable, ScrollView, TouchableOpacity, View } from "react-native";
 import AppText from "@/src/components/shared/AppText";
 import AppButton from "@/src/components/shared/AppButton";
-import ChevronIcon from "@/src/assets/images/ChevronIcon.svg";
+import ClockIcon from "@/src/assets/images/clock.svg";
 import { shadowStyles } from "@/src/constants/stylesheets";
 import { router } from "expo-router";
-import { useLocalSearchParams } from "expo-router";
-import { useQueryClient } from "@tanstack/react-query";
-import { AuditSite } from "@/src/types";
 import { FlashList } from "@shopify/flash-list";
 import useRootStore from "@/src/hooks/stores/useRootstore";
+import { useQueryClient } from "@tanstack/react-query";
 
-export default function PendingSubmissionScreen() {
-	const params = useLocalSearchParams();
-	const { setSiteAuditToUpload, pendingSites } = useRootStore();
+export default function PendingApprovalScreen() {
+	const { pendingApprovalSites } = useRootStore();
 
-	const advertiser = params.advertiser;
-	const data = pendingSites?.filter(
-		(site) => site.advertiser.name === advertiser
-	);
+	const queryClient = useQueryClient();
+
+	const assignedSites: any[] | undefined = queryClient.getQueryData([
+		"compliance-sites",
+	]);
+
+	const data = pendingApprovalSites.map((s) => {
+		const site = assignedSites?.find((d) => d.siteCode === s.siteCode);
+		return site;
+	});
 
 	return (
 		<View className="flex-1 bg-white px-[15px]">
 			<ScrollView>
 				<View className="pt-[20px] border-t border-t-[#E7E7E7] flex-row justify-between w-full">
 					<AppText weight="ExtraBold" className="text-[25px]">
-						{advertiser}
+						Pending Approval
 					</AppText>
 				</View>
 				<View className="mt-[30px]">
@@ -33,14 +36,12 @@ export default function PendingSubmissionScreen() {
 						data={data}
 						showsVerticalScrollIndicator={false}
 						renderItem={({ item }) => {
+							if (!item) {
+								return <View></View>;
+							}
+
 							return (
-								<TouchableOpacity
-									onPress={() => {
-										setSiteAuditToUpload(item);
-										router.push(
-											`/compliance-reports/submit-report?siteCode=${item.siteCode}`
-										);
-									}}
+								<Pressable
 									style={shadowStyles.shadow}
 									className="w-full rounded-[10px] border border-[#D3D3D3] bg-white mb-[15px]">
 									<View className="p-[10px] border-b border-[#D3D3D3] ">
@@ -62,17 +63,17 @@ export default function PendingSubmissionScreen() {
 										<View className="w-[160px]">
 											<AppButton
 												disabled
-												className="!rounded-full items-center !h-[45px] gap-[5px]">
+												className="!rounded-full items-center !h-[45px] gap-[5px] !bg-[##FF8617]">
 												<AppText className="text-white text-[17px]">
-													Submit Report
+													Pending
 												</AppText>
-												<View className="shrink-0 rotate-[-90deg]">
-													<ChevronIcon fill={"white"} />
+												<View className="shrink-0">
+													<ClockIcon fill={"white"} />
 												</View>
 											</AppButton>
 										</View>
 									</View>
-								</TouchableOpacity>
+								</Pressable>
 							);
 						}}
 						estimatedItemSize={200}
