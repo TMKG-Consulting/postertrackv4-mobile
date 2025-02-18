@@ -227,6 +227,7 @@ export default function SubmitReportForm() {
 			});
 
 			siteImages.forEach((image) => {
+				console.log(image);
 				// @ts-ignore
 				data.append("imageUrls", {
 					// @ts-ignore

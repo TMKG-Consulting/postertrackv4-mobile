@@ -40,8 +40,8 @@ export default function ComplianceReportScreen() {
 	} = useQuery({
 		queryKey: ["pending-approval"],
 		queryFn: async () => {
-			const response = await ApiInstance.get("/compliance/pending-approval");
-			return response.data.pendingSites;
+			const response = await ApiInstance.get("/site-pending-approval");
+			return response.data.pendingApprovals;
 		},
 		retry: false,
 		gcTime: 0,
