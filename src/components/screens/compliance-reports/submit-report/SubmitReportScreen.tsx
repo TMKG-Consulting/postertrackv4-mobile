@@ -28,7 +28,11 @@ export default function SubmitReportScreen() {
 				/>
 			</View>
 			<View className="flex-1 mt-[20px]">
-				{currentTab === "info" && <SiteInfo />}
+				{currentTab === "info" && (
+					<View className="px-[15px]">
+						<SiteInfo />
+					</View>
+				)}
 				{currentTab === "submit" && <SubmitReportForm />}
 			</View>
 		</View>

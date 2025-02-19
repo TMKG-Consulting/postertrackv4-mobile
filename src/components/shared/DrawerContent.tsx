@@ -3,14 +3,28 @@ import { Pressable, View } from "react-native";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
 import CloseIcon from "@/src/assets/images/XIcon.svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import AppText from "./AppText";
 import Avatar from "./Avatar";
 import { shadowStyles } from "@/src/constants/stylesheets";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import AppButton from "./AppButton";
+import * as SecureStore from "expo-secure-store";
+import useRootStore from "@/src/hooks/stores/useRootstore";
 
 export default function DrawerContent(props: DrawerContentComponentProps) {
 	const { top } = useSafeAreaInsets();
+	const { setIsAuthenticated } = useRootStore();
+
+	async function logout() {
+		try {
+			await SecureStore.deleteItemAsync("accessToken");
+			setIsAuthenticated(false);
+			router.replace("/auth/login");
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
 	return (
 		<View className="flex-1 px-[15px]">
@@ -40,6 +54,11 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
 						</AppText>
 					</Pressable>
 				</Link>
+				<AppButton onPress={logout} className="!w-[150px] !h-[50px]">
+					<AppText className="text-[15px] text-white" weight="Medium">
+						Log Out
+					</AppText>
+				</AppButton>
 			</View>
 			<Link asChild href={"/"}>
 				<TouchableOpacity>

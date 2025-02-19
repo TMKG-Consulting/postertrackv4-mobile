@@ -43,11 +43,11 @@ import {
 } from "expo-location";
 import { Image } from "expo-image";
 import { Redirect, router, useLocalSearchParams } from "expo-router";
-import { useQueryClient } from "@tanstack/react-query";
 import useRootStore from "@/src/hooks/stores/useRootstore";
 import Loader from "@/src/components/shared/Loader";
 import mime from "mime";
 import ApiInstance from "@/src/utils/api-instance";
+import SubmissionReview from "./SubmissionReview";
 
 const schema = Yup.object().shape({
 	siteCode: Yup.string().required().label("Site Code"),
@@ -67,7 +67,7 @@ const schema = Yup.object().shape({
 	city: Yup.string().required().label("City"),
 });
 
-interface SiteUploadData {
+export interface SiteUploadData {
 	siteCode: string;
 
 	campaignId: number | string;
@@ -97,6 +97,7 @@ interface SiteUploadData {
 	address: string;
 
 	city: string;
+	state: string;
 }
 
 export default function SubmitReportForm() {
@@ -112,6 +113,8 @@ export default function SubmitReportForm() {
 	const [siteImages, setSiteImages] = useState<AssetInfo[]>([]);
 	const { showAndHideAlert } = useAlert();
 	const { siteAuditToUpload } = useRootStore();
+
+	const [showReview, setShowReview] = useState(false);
 
 	if (!siteAuditToUpload) {
 		return <Redirect href={"/(main)/home"} />;
@@ -132,14 +135,19 @@ export default function SubmitReportForm() {
 		routeId: "",
 		sideId: "",
 		address: siteAuditToUpload.address,
-		city: siteAuditToUpload.state,
+		city: siteAuditToUpload.city,
+		state: siteAuditToUpload.state,
 	};
 
 	async function showGallery() {
 		const result = await launchImageLibraryAsync({
-			allowsMultipleSelection: true,
+			allowsMultipleSelection: false,
 			exif: true,
+			allowsEditing: false,
+			mediaTypes: ["images"],
+			legacy: true,
 		});
+
 		if (result.canceled) {
 			return;
 		} else {
@@ -227,7 +235,6 @@ export default function SubmitReportForm() {
 			});
 
 			siteImages.forEach((image) => {
-				console.log(image);
 				// @ts-ignore
 				data.append("imageUrls", {
 					// @ts-ignore
@@ -301,101 +308,112 @@ export default function SubmitReportForm() {
 			}) => (
 				<View className="flex-1">
 					<ScrollView>
-						<View className="gap-y-[15px] p-[10px] bg-[#F5F5F5]">
-							<SelectStructure
-								structureRef={structureRef}
-								val={values.structureId}
-								errorMessage={errors.structureId}
-							/>
-							<SelectPoster
-								posterRef={posterRef}
-								val={values.posterId}
-								errorMessage={errors.posterId}
-							/>
-							<SelectIllumination
-								illuminationRef={illuminationRef}
-								val={values.illuminationId}
-								errorMessage={errors.illuminationId}
-							/>
-							<SelectRoute
-								routeRef={routeRef}
-								val={values.routeId}
-								errorMessage={errors.routeId}
-							/>
-							<SelectSide
-								sideRef={sideRef}
-								val={values.sideId}
-								errorMessage={errors.sideId}
-							/>
-							<AppInput.TextArea
-								label="Message"
-								value={values.message}
-								placeholder="Message"
-								errorMessage={errors.message}
-								onChange={(val) => setFieldValue("message", val)}
-							/>
-							<AppInput.TextArea
-								label="Comment"
-								value={values.comment}
-								placeholder="Comment"
-								errorMessage={errors.comment}
-								onChange={(val) => setFieldValue("comment", val)}
-							/>
-							<View className="gap-y-[10px]">
-								<View className="flex-row items-center gap-[10px]">
-									<AppButton
-										onPress={PickImage}
-										className="!w-1/2 !bg-white border border-[#ececec] gap-[10px]">
-										<ImageIcon />
-										<AppText className="text-[17px] text-[#8d8d8d]">
-											Select Image
-										</AppText>
-									</AppButton>
-									<AppButton
-										onPress={TakeShot}
-										className="!w-1/2 !bg-white border border-[#ececec] gap-[10px]">
-										<CameraIcon />
-										<AppText className="text-[17px] text-[#8d8d8d]">
-											Take Photo
-										</AppText>
-									</AppButton>
-								</View>
-							</View>
-
-							{siteImages.length > 0 && (
-								<ScrollView showsHorizontalScrollIndicator={false} horizontal>
-									<View className="flex-row h-[200px] items-center">
-										{siteImages.map((image, i) => (
-											<TouchableOpacity
-												style={{ marginRight: 20 }}
-												className="relative"
-												onPress={() => {
-													removeSiteImage(i);
-												}}
-												key={i}>
-												<View className="absolute w-[25px] h-[25px] bg-red-400 rounded-full top-[-5px] right-[-10px] z-[999999] items-center justify-center">
-													<XIcon width={12} fill={"white"} />
-												</View>
-												<Image
-													style={{ width: 145, height: 148, borderRadius: 10 }}
-													source={image.localUri}
-												/>
-											</TouchableOpacity>
-										))}
+						{showReview && (
+							<SubmissionReview submission={values} images={siteImages} />
+						)}
+						{!showReview && (
+							<View className="gap-y-[15px] p-[10px] bg-[#F5F5F5]">
+								<SelectStructure
+									structureRef={structureRef}
+									val={values.structureId}
+									errorMessage={errors.structureId}
+								/>
+								<SelectPoster
+									posterRef={posterRef}
+									val={values.posterId}
+									errorMessage={errors.posterId}
+								/>
+								<SelectIllumination
+									illuminationRef={illuminationRef}
+									val={values.illuminationId}
+									errorMessage={errors.illuminationId}
+								/>
+								<SelectRoute
+									routeRef={routeRef}
+									val={values.routeId}
+									errorMessage={errors.routeId}
+								/>
+								<SelectSide
+									sideRef={sideRef}
+									val={values.sideId}
+									errorMessage={errors.sideId}
+								/>
+								<AppInput.TextArea
+									label="Message"
+									value={values.message}
+									placeholder="Message"
+									errorMessage={errors.message}
+									onChange={(val) => setFieldValue("message", val)}
+								/>
+								<AppInput.TextArea
+									label="Comment"
+									value={values.comment}
+									placeholder="Comment"
+									errorMessage={errors.comment}
+									onChange={(val) => setFieldValue("comment", val)}
+								/>
+								<View className="gap-y-[10px]">
+									<View className="flex-row items-center gap-[10px]">
+										<AppButton
+											onPress={PickImage}
+											className="!w-1/2 !bg-white border border-[#ececec] gap-[10px]">
+											<ImageIcon />
+											<AppText className="text-[17px] text-[#8d8d8d]">
+												Select Image
+											</AppText>
+										</AppButton>
+										<AppButton
+											onPress={TakeShot}
+											className="!w-1/2 !bg-white border border-[#ececec] gap-[10px]">
+											<CameraIcon />
+											<AppText className="text-[17px] text-[#8d8d8d]">
+												Take Photo
+											</AppText>
+										</AppButton>
 									</View>
-								</ScrollView>
-							)}
+								</View>
 
-							<AppButton
-								onPress={() => {
-									handleSubmit();
-								}}>
-								{!isSubmitting && (
-									<AppText className="text-[17px] text-white">Submit</AppText>
+								{siteImages.length > 0 && (
+									<ScrollView showsHorizontalScrollIndicator={false} horizontal>
+										<View className="flex-row h-[200px] items-center">
+											{siteImages.map((image, i) => (
+												<TouchableOpacity
+													style={{ marginRight: 20 }}
+													className="relative"
+													onPress={() => {
+														removeSiteImage(i);
+													}}
+													key={i}>
+													<View className="absolute w-[25px] h-[25px] bg-red-400 rounded-full top-[-5px] right-[-10px] z-[999999] items-center justify-center">
+														<XIcon width={12} fill={"white"} />
+													</View>
+													<Image
+														style={{
+															width: 145,
+															height: 148,
+															borderRadius: 10,
+														}}
+														source={image.localUri}
+													/>
+												</TouchableOpacity>
+											))}
+										</View>
+									</ScrollView>
 								)}
-								{isSubmitting && !isValidating && <Loader useWhite />}
-							</AppButton>
-						</View>
+
+								<AppButton
+									onPress={() => {
+										setShowReview(true);
+									}}>
+									{!isSubmitting && (
+										<AppText className="text-[17px] text-white">
+											Continue
+										</AppText>
+									)}
+									{isSubmitting && !isValidating && <Loader useWhite />}
+								</AppButton>
+							</View>
+						)}
 					</ScrollView>
 					<StructureList
 						sheetRef={structureRef}

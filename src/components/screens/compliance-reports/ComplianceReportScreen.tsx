@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect } from "react";
 import { Pressable, View } from "react-native";
 import AppText from "../../shared/AppText";
-import CalendarIcon from "@/src/assets/images/Calendar.svg";
-import ChevronIcon from "@/src/assets/images/ChevronIcon.svg";
 import { router, useFocusEffect } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import ApiInstance from "@/src/utils/api-instance";
@@ -95,15 +93,6 @@ export default function ComplianceReportScreen() {
 				<AppText weight="ExtraBold" className="text-[25px]">
 					{data?.length} Sites
 				</AppText>
-				{/* <Pressable className="h-[45px] w-[190px] p-[10px] rounded-[10px] border-[#E3E3E3] border flex-row items-center justify-between">
-					<View className="flex-row items-center gap-[10px]">
-						<CalendarIcon />
-						<AppText className="text-[15px]" weight="Medium">
-							January 2024
-						</AppText>
-					</View>
-					<ChevronIcon fill={"#140100"} />
-				</Pressable> */}
 			</View>
 			<View className="mt-[30px] flex-row flex-wrap justify-between gap-y-[15px]">
 				<Pressable
