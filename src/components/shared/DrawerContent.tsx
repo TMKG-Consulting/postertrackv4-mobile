@@ -14,7 +14,7 @@ import useRootStore from "@/src/hooks/stores/useRootstore";
 
 export default function DrawerContent(props: DrawerContentComponentProps) {
 	const { top } = useSafeAreaInsets();
-	const { setIsAuthenticated } = useRootStore();
+	const { setIsAuthenticated, userDetails } = useRootStore();
 
 	async function logout() {
 		try {
@@ -60,20 +60,17 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
 					</AppText>
 				</AppButton>
 			</View>
-			<Link asChild href={"/"}>
+			<Link asChild href={"/profile"}>
 				<TouchableOpacity>
 					<View className="flex-row items-center justify-between mt-[30px] pt-[15px] border-t border-t-[#D1D1D1]">
 						<View className="flex-row items-center gap-x-[10px]">
-							<Avatar
-								size={50}
-								src="https://plus.unsplash.com/premium_photo-1671656349218-5218444643d8?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-							/>
+							<Avatar size={50} src={userDetails?.profilePicture ?? ""} />
 							<AppText
 								className="text-[17px] w-[180px]"
 								numberOfLines={1}
 								ellipsizeMode="tail"
 								weight="SemiBold">
-								Adams Muhammed
+								{userDetails?.firstname} {userDetails?.lastname}
 							</AppText>
 						</View>
 					</View>

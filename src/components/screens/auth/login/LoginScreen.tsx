@@ -11,6 +11,7 @@ import ApiInstance from "@/src/utils/api-instance";
 import * as SecureStore from "expo-secure-store";
 import Loader from "@/src/components/shared/Loader";
 import { router } from "expo-router";
+import useRootStore from "@/src/hooks/stores/useRootstore";
 
 const schema = Yup.object().shape({
 	email: Yup.string().required().email().label("Email"),
@@ -24,6 +25,7 @@ interface LoginData {
 
 export default function LoginScreen() {
 	const { showAndHideAlert } = useAlert();
+	const { setUserDetails } = useRootStore();
 
 	const initialValues: LoginData = {
 		email: "",
@@ -38,6 +40,9 @@ export default function LoginScreen() {
 			const response = await ApiInstance.post("/login", values);
 
 			await SecureStore.setItemAsync("accessToken", response.data.token);
+
+			const response2 = await ApiInstance.get("/user/detail");
+			setUserDetails(response2.data);
 
 			showAndHideAlert({
 				message: "Logged In Successfully",

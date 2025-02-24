@@ -8,6 +8,7 @@ export interface User {
 	phone: string;
 	profilePicture: string | null;
 	role: "FIELD_AUDITOR";
+	statesCovered: { id: number; name: string; regionId: number }[];
 }
 
 export interface AuditSite {

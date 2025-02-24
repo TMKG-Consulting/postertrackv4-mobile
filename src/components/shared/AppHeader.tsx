@@ -8,7 +8,7 @@ import { DrawerHeaderProps } from "@react-navigation/drawer";
 import { shadowStyles } from "@/src/constants/stylesheets";
 import { router, usePathname } from "expo-router";
 import AppText from "./AppText";
-import { Pressable } from "react-native-gesture-handler";
+import { Pressable, TouchableOpacity } from "react-native-gesture-handler";
 
 export default function AppHeader(props: DrawerHeaderProps) {
 	const { top } = useSafeAreaInsets();
@@ -22,13 +22,21 @@ export default function AppHeader(props: DrawerHeaderProps) {
 			<View style={{ paddingTop: top }}></View>
 			<View className=" w-full items-center flex-row justify-between h-[80px]">
 				{isHome && (
-					<View
-						style={shadowStyles.shadow}
-						className="w-[45px] h-[45px] rounded-full bg-white items-center justify-center">
-						<Pressable onPress={() => navigation.toggleDrawer()}>
-							<Hamburger />
-						</Pressable>
-					</View>
+					<Pressable
+						style={[
+							shadowStyles.shadow,
+							{
+								width: 45,
+								height: 45,
+								borderRadius: 100,
+								backgroundColor: "white",
+								alignItems: "center",
+								justifyContent: "center",
+							},
+						]}
+						onPress={() => navigation.toggleDrawer()}>
+						<Hamburger />
+					</Pressable>
 				)}
 				{!isHome && (
 					<Pressable

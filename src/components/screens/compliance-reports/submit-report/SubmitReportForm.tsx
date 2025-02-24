@@ -141,7 +141,7 @@ export default function SubmitReportForm() {
 
 	async function showGallery() {
 		const result = await launchImageLibraryAsync({
-			allowsMultipleSelection: false,
+			allowsMultipleSelection: true,
 			exif: true,
 			allowsEditing: false,
 			mediaTypes: ["images"],

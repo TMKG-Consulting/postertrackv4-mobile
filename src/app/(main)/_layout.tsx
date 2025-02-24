@@ -19,6 +19,7 @@ export default function _layout() {
 			/>
 			<Drawer.Screen name="competitive-reports" />
 			<Drawer.Screen name="home" />
+			<Drawer.Screen name="profile" options={{ title: "Profile" }} />
 		</Drawer>
 	);
 }
