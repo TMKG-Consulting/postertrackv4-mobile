@@ -1,11 +1,12 @@
 import AppText from "@/src/components/shared/AppText";
 import BottomSheet from "@/src/components/shared/BottomSheet";
+import useRootStore from "@/src/hooks/stores/useRootstore";
 import ApiInstance from "@/src/utils/api-instance";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { BottomSheetFlashList } from "@gorhom/bottom-sheet";
 import { useQuery } from "@tanstack/react-query";
 import { useFormikContext } from "formik";
-import React from "react";
+import React, { useEffect } from "react";
 import { TouchableOpacity, View } from "react-native";
 
 export default function SideList({
@@ -16,8 +17,9 @@ export default function SideList({
 	selectedSide: number | string;
 }) {
 	const { setFieldValue } = useFormikContext();
+	const { side, setSide } = useRootStore();
 
-	const { data, isLoading } = useQuery({
+	const { data, isLoading, refetch } = useQuery({
 		queryKey: ["entities", "sides"],
 		queryFn: async () => {
 			const response = await ApiInstance.get("/entities");
@@ -25,6 +27,18 @@ export default function SideList({
 		},
 		gcTime: 0,
 	});
+
+	useEffect(() => {
+		if (data) {
+			setSide(data);
+		}
+	}, [data, side]);
+
+	useEffect(() => {
+		if (side.length === 0 && !isLoading) {
+			refetch();
+		}
+	}, [side, isLoading]);
 
 	return (
 		<BottomSheet
@@ -34,7 +48,7 @@ export default function SideList({
 			snapIndex={0}>
 			<View className=" flex-1">
 				<BottomSheetFlashList
-					data={isLoading ? [] : data}
+					data={isLoading ? [] : side}
 					estimatedItemSize={200}
 					renderItem={({ item }: { item: { id: number; name: string } }) => (
 						<TouchableOpacity

@@ -17,13 +17,14 @@ export default function SelectIllumination({
 }) {
 	const queryClient = useQueryClient();
 	const [value, setValue] = useState("");
+	const { illumination } = useRootStore();
 
 	useEffect(() => {
 		const data = queryClient.getQueryData(["entities", "illuminations"]);
 
 		if (val !== "") {
 			// @ts-ignore
-			setValue(data?.find((d) => Number(d.id) === Number(val)).name);
+			setValue(illumination?.find((d) => Number(d.id) === Number(val)).name);
 		}
 	}, [val]);
 
@@ -42,7 +43,6 @@ export default function SelectIllumination({
 						Select Illumination
 					</AppText>
 				)}
-
 				{value !== "" && <AppText className="text-[15px]">{value}</AppText>}
 				<View>
 					<ChevronIcon fill={"#8d8d8d"} />

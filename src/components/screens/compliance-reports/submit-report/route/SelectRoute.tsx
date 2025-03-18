@@ -17,13 +17,14 @@ export default function SelectRoute({
 }) {
 	const queryClient = useQueryClient();
 	const [value, setValue] = useState("");
+	const { route } = useRootStore();
 
 	useEffect(() => {
 		const data = queryClient.getQueryData(["entities", "routes"]);
 
 		if (val !== "") {
 			// @ts-ignore
-			setValue(data?.find((d) => Number(d.id) === Number(val)).name);
+			setValue(route?.find((d) => Number(d.id) === Number(val)).name);
 		}
 	}, [val]);
 

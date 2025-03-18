@@ -17,13 +17,14 @@ export default function SelectSide({
 }) {
 	const queryClient = useQueryClient();
 	const [value, setValue] = useState("");
+	const { side } = useRootStore();
 
 	useEffect(() => {
 		const data = queryClient.getQueryData(["entities", "sides"]);
 
 		if (val !== "") {
 			// @ts-ignore
-			setValue(data?.find((d) => Number(d.id) === Number(val)).name);
+			setValue(side?.find((d) => Number(d.id) === Number(val)).name);
 		}
 	}, [val]);
 

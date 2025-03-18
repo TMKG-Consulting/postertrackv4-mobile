@@ -15,9 +15,11 @@ import { useFormikContext } from "formik";
 export default function SubmissionReview({
 	submission,
 	images,
+	goBack,
 }: {
 	submission: SiteUploadData;
 	images: AssetInfo[];
+	goBack: () => void;
 }) {
 	const queryClient = useQueryClient();
 	const { isSubmitting, isValidating, handleSubmit } = useFormikContext();
@@ -37,7 +39,7 @@ export default function SubmissionReview({
 
 						return data?.find(
 							(d: any) => Number(d.id) === Number(submission.structureId)
-						).name;
+						)?.name;
 					})()}
 				</AppText>
 			</View>
@@ -51,7 +53,7 @@ export default function SubmissionReview({
 
 						return data?.find(
 							(d: any) => Number(d.id) === Number(submission.posterId)
-						).name;
+						)?.name;
 					})()}
 				</AppText>
 			</View>
@@ -68,7 +70,7 @@ export default function SubmissionReview({
 
 						return data?.find(
 							(d: any) => Number(d.id) === Number(submission.illuminationId)
-						).name;
+						)?.name;
 					})()}
 				</AppText>
 			</View>
@@ -124,14 +126,23 @@ export default function SubmissionReview({
 										height: 148,
 										borderRadius: 10,
 									}}
-									source={image.localUri}
+									source={image.uri}
 								/>
 							</TouchableOpacity>
 						))}
 					</View>
 				</ScrollView>
 			)}
-
+			<AppButton
+				className="!bg-white "
+				onPress={() => {
+					goBack();
+				}}>
+				{!isSubmitting && (
+					<AppText className="text-[17px] !text-[#373737]">Go Back</AppText>
+				)}
+				{isSubmitting && !isValidating && <Loader useWhite />}
+			</AppButton>
 			<AppButton
 				onPress={() => {
 					handleSubmit();

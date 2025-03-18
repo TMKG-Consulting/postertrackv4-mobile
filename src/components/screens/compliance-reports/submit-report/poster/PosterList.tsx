@@ -5,8 +5,9 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { BottomSheetFlashList } from "@gorhom/bottom-sheet";
 import { useQuery } from "@tanstack/react-query";
 import { useFormikContext } from "formik";
-import React from "react";
+import React, { useEffect } from "react";
 import { Pressable, TouchableOpacity, View } from "react-native";
+import useRootStore from "@/src/hooks/stores/useRootstore";
 
 export default function PosterList({
 	sheetRef,
@@ -16,8 +17,9 @@ export default function PosterList({
 	selectedPoster: number | string;
 }) {
 	const { setFieldValue } = useFormikContext();
+	const { setPosters, posters } = useRootStore();
 
-	const { data, isLoading } = useQuery({
+	const { data, isLoading, refetch } = useQuery({
 		queryKey: ["entities", "posters"],
 		queryFn: async () => {
 			const response = await ApiInstance.get("/entities");
@@ -25,6 +27,18 @@ export default function PosterList({
 		},
 		gcTime: 0,
 	});
+
+	useEffect(() => {
+		if (data) {
+			setPosters(data);
+		}
+	}, [data, posters]);
+
+	useEffect(() => {
+		if (posters.length === 0 && !isLoading) {
+			refetch();
+		}
+	}, [posters, isLoading]);
 
 	return (
 		<BottomSheet
@@ -34,7 +48,7 @@ export default function PosterList({
 			snapIndex={0}>
 			<View className=" flex-1">
 				<BottomSheetFlashList
-					data={isLoading ? [] : data}
+					data={isLoading ? [] : posters}
 					estimatedItemSize={200}
 					renderItem={({ item }: { item: { id: number; name: string } }) => (
 						<TouchableOpacity

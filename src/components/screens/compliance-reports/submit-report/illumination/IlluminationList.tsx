@@ -5,8 +5,9 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { BottomSheetFlashList } from "@gorhom/bottom-sheet";
 import { useQuery } from "@tanstack/react-query";
 import { useFormikContext } from "formik";
-import React from "react";
+import React, { useEffect } from "react";
 import { Pressable, TouchableOpacity, View } from "react-native";
+import useRootStore from "@/src/hooks/stores/useRootstore";
 
 export default function IlluminationList({
 	sheetRef,
@@ -16,8 +17,9 @@ export default function IlluminationList({
 	selectedIllumination: number | string;
 }) {
 	const { setFieldValue } = useFormikContext();
+	const { illumination, setIllumination } = useRootStore();
 
-	const { data, isLoading } = useQuery({
+	const { data, isLoading, refetch } = useQuery({
 		queryKey: ["entities", "illuminations"],
 		queryFn: async () => {
 			const response = await ApiInstance.get("/entities");
@@ -25,6 +27,18 @@ export default function IlluminationList({
 		},
 		gcTime: 0,
 	});
+
+	useEffect(() => {
+		if (data) {
+			setIllumination(data);
+		}
+	}, [data, illumination]);
+
+	useEffect(() => {
+		if (illumination.length === 0 && !isLoading) {
+			refetch();
+		}
+	}, [illumination, isLoading]);
 
 	return (
 		<BottomSheet
@@ -34,7 +48,7 @@ export default function IlluminationList({
 			snapIndex={0}>
 			<View className=" flex-1">
 				<BottomSheetFlashList
-					data={isLoading ? [] : data}
+					data={isLoading ? [] : illumination}
 					estimatedItemSize={200}
 					renderItem={({ item }: { item: { id: number; name: string } }) => (
 						<TouchableOpacity

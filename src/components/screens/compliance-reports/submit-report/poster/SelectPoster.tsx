@@ -17,13 +17,14 @@ export default function SelectPoster({
 }) {
 	const queryClient = useQueryClient();
 	const [value, setValue] = useState("");
+	const { posters } = useRootStore();
 
 	useEffect(() => {
 		const data = queryClient.getQueryData(["entities", "posters"]);
 
 		if (val !== "") {
 			// @ts-ignore
-			setValue(data?.find((d) => Number(d.id) === Number(val)).name);
+			setValue(posters?.find((d) => Number(d.id) === Number(val)).name);
 		}
 	}, [val]);
 

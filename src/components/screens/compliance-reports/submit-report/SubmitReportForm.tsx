@@ -48,6 +48,9 @@ import Loader from "@/src/components/shared/Loader";
 import mime from "mime";
 import ApiInstance from "@/src/utils/api-instance";
 import SubmissionReview from "./SubmissionReview";
+import { Modal } from "react-native";
+import CustomImagePicker from "@/src/components/shared/CustomImagePicker";
+import { writeAsync, readAsync } from "@lodev09/react-native-exify";
 
 const schema = Yup.object().shape({
 	siteCode: Yup.string().required().label("Site Code"),
@@ -58,11 +61,11 @@ const schema = Yup.object().shape({
 	mediaOwner: Yup.string().required().label("Media Owner"),
 	message: Yup.string().required().label("Message"),
 	comment: Yup.string().required().label("Comment"),
-	structureId: Yup.number().required().label("Structure"),
-	posterId: Yup.number().required().label("Poster"),
-	illuminationId: Yup.number().required().label("illumination"),
-	routeId: Yup.number().required().label("Route"),
-	sideId: Yup.number().required().label("Side"),
+	structureId: Yup.mixed().required().label("Structure"),
+	posterId: Yup.mixed().required().label("Poster"),
+	illuminationId: Yup.mixed().required().label("illumination"),
+	routeId: Yup.mixed().required().label("Route"),
+	sideId: Yup.mixed().required().label("Side"),
 	address: Yup.string().required().label("Address"),
 	city: Yup.string().required().label("City"),
 });
@@ -115,6 +118,7 @@ export default function SubmitReportForm() {
 	const { siteAuditToUpload } = useRootStore();
 
 	const [showReview, setShowReview] = useState(false);
+	const [isPickingImage, setIsPickingImage] = useState(false);
 
 	if (!siteAuditToUpload) {
 		return <Redirect href={"/(main)/home"} />;
@@ -154,6 +158,7 @@ export default function SubmitReportForm() {
 			try {
 				const savedAssets = await Promise.all(
 					result.assets.map(async (asset) => {
+						console.log(asset);
 						const localAsset = await createAssetAsync(asset.uri);
 						const assetInfo = await getAssetInfoAsync(localAsset);
 						return assetInfo;
@@ -178,6 +183,7 @@ export default function SubmitReportForm() {
 
 		const savedAssets = await Promise.all(
 			result.assets.map(async (asset) => {
+				console.log(asset);
 				const localAsset = await createAssetAsync(asset.uri);
 				const assetInfo = await getAssetInfoAsync(localAsset);
 				return assetInfo;
@@ -235,13 +241,14 @@ export default function SubmitReportForm() {
 			});
 
 			siteImages.forEach((image) => {
+				console.log(image, "lll");
 				// @ts-ignore
 				data.append("imageUrls", {
 					// @ts-ignore
-					uri: image.localUri,
+					uri: image.uri,
 					name: image.filename,
 					// @ts-ignore
-					type: mime.getType(image.localUri),
+					type: mime.getType(image.uri),
 				});
 			});
 
@@ -259,7 +266,7 @@ export default function SubmitReportForm() {
 			router.replace("/compliance-reports");
 		} catch (error) {
 			const err = error as AxiosError<any>;
-
+			console.error(err);
 			showAndHideAlert({
 				message:
 					err.response?.data.message ??
@@ -298,136 +305,180 @@ export default function SubmitReportForm() {
 			validationSchema={schema}
 			onSubmit={submitHandler}
 			initialValues={initialValues}>
-			{({
-				isSubmitting,
-				isValidating,
-				errors,
-				values,
-				setFieldValue,
-				handleSubmit,
-			}) => (
-				<View className="flex-1">
-					<ScrollView>
-						{showReview && (
-							<SubmissionReview submission={values} images={siteImages} />
-						)}
-						{!showReview && (
-							<View className="gap-y-[15px] p-[10px] bg-[#F5F5F5]">
-								<SelectStructure
-									structureRef={structureRef}
-									val={values.structureId}
-									errorMessage={errors.structureId}
+			{({ isSubmitting, isValidating, errors, values, setFieldValue }) =>
+				isPickingImage ? (
+					<Modal visible={isPickingImage}>
+						<CustomImagePicker
+							visible={true}
+							cancel={() => {
+								setIsPickingImage(false);
+							}}
+							callback={async (assets) => {
+								try {
+									const ras = await getAssetInfoAsync(assets[0]);
+									const tags = await readAsync(ras.localUri ?? "");
+									console.log(ras, tags);
+									setSiteImages((prev) => [...prev, ...assets]);
+								} catch (error) {
+									console.log(error);
+								}
+							}}
+						/>
+					</Modal>
+				) : (
+					<View className="flex-1">
+						<ScrollView>
+							{showReview && (
+								<SubmissionReview
+									submission={values}
+									images={siteImages}
+									goBack={() => {
+										setShowReview(false);
+									}}
 								/>
-								<SelectPoster
-									posterRef={posterRef}
-									val={values.posterId}
-									errorMessage={errors.posterId}
-								/>
-								<SelectIllumination
-									illuminationRef={illuminationRef}
-									val={values.illuminationId}
-									errorMessage={errors.illuminationId}
-								/>
-								<SelectRoute
-									routeRef={routeRef}
-									val={values.routeId}
-									errorMessage={errors.routeId}
-								/>
-								<SelectSide
-									sideRef={sideRef}
-									val={values.sideId}
-									errorMessage={errors.sideId}
-								/>
-								<AppInput.TextArea
-									label="Message"
-									value={values.message}
-									placeholder="Message"
-									errorMessage={errors.message}
-									onChange={(val) => setFieldValue("message", val)}
-								/>
-								<AppInput.TextArea
-									label="Comment"
-									value={values.comment}
-									placeholder="Comment"
-									errorMessage={errors.comment}
-									onChange={(val) => setFieldValue("comment", val)}
-								/>
-								<View className="gap-y-[10px]">
-									<View className="flex-row items-center gap-[10px]">
-										<AppButton
-											onPress={PickImage}
-											className="!w-1/2 !bg-white border border-[#ececec] gap-[10px]">
-											<ImageIcon />
-											<AppText className="text-[17px] text-[#8d8d8d]">
-												Select Image
-											</AppText>
-										</AppButton>
-										<AppButton
-											onPress={TakeShot}
-											className="!w-1/2 !bg-white border border-[#ececec] gap-[10px]">
-											<CameraIcon />
-											<AppText className="text-[17px] text-[#8d8d8d]">
-												Take Photo
-											</AppText>
-										</AppButton>
-									</View>
-								</View>
-
-								{siteImages.length > 0 && (
-									<ScrollView showsHorizontalScrollIndicator={false} horizontal>
-										<View className="flex-row h-[200px] items-center">
-											{siteImages.map((image, i) => (
-												<TouchableOpacity
-													style={{ marginRight: 20 }}
-													className="relative"
-													onPress={() => {
-														removeSiteImage(i);
-													}}
-													key={i}>
-													<View className="absolute w-[25px] h-[25px] bg-red-400 rounded-full top-[-5px] right-[-10px] z-[999999] items-center justify-center">
-														<XIcon width={12} fill={"white"} />
-													</View>
-													<Image
-														style={{
-															width: 145,
-															height: 148,
-															borderRadius: 10,
-														}}
-														source={image.localUri}
-													/>
-												</TouchableOpacity>
-											))}
+							)}
+							{!showReview && (
+								<View className="gap-y-[15px] p-[10px] bg-[#F5F5F5]">
+									<SelectStructure
+										structureRef={structureRef}
+										val={values.structureId}
+										errorMessage={errors.structureId}
+									/>
+									<SelectPoster
+										posterRef={posterRef}
+										val={values.posterId}
+										errorMessage={errors.posterId}
+									/>
+									<SelectIllumination
+										illuminationRef={illuminationRef}
+										val={values.illuminationId}
+										errorMessage={errors.illuminationId}
+									/>
+									<SelectRoute
+										routeRef={routeRef}
+										val={values.routeId}
+										errorMessage={errors.routeId}
+									/>
+									<SelectSide
+										sideRef={sideRef}
+										val={values.sideId}
+										errorMessage={errors.sideId}
+									/>
+									<AppInput.TextArea
+										label="Message"
+										value={values.message}
+										placeholder="Message"
+										errorMessage={errors.message}
+										onChange={(val) => setFieldValue("message", val)}
+									/>
+									<AppInput.TextArea
+										label="Comment"
+										value={values.comment}
+										placeholder="Comment"
+										errorMessage={errors.comment}
+										onChange={(val) => setFieldValue("comment", val)}
+									/>
+									<View className="gap-y-[10px]">
+										<View className="flex-row items-center gap-[10px]">
+											<AppButton
+												onPress={() => {
+													setIsPickingImage(true);
+												}}
+												className="!w-1/2 !bg-white border border-[#ececec] gap-[10px]">
+												<ImageIcon />
+												<AppText className="text-[17px] text-[#8d8d8d]">
+													Select Image
+												</AppText>
+											</AppButton>
+											<AppButton
+												onPress={TakeShot}
+												className="!w-1/2 !bg-white border border-[#ececec] gap-[10px]">
+												<CameraIcon />
+												<AppText className="text-[17px] text-[#8d8d8d]">
+													Take Photo
+												</AppText>
+											</AppButton>
 										</View>
-									</ScrollView>
-								)}
+									</View>
 
-								<AppButton
-									onPress={() => {
-										setShowReview(true);
-									}}>
-									{!isSubmitting && (
-										<AppText className="text-[17px] text-white">
-											Continue
-										</AppText>
+									{siteImages.length > 0 && (
+										<ScrollView
+											showsHorizontalScrollIndicator={false}
+											horizontal>
+											<View className="flex-row h-[200px] items-center">
+												{siteImages.map((image, i) => (
+													<TouchableOpacity
+														style={{ marginRight: 20 }}
+														className="relative"
+														onPress={() => {
+															removeSiteImage(i);
+														}}
+														key={i}>
+														<View className="absolute w-[25px] h-[25px] bg-red-400 rounded-full top-[-5px] right-[-10px] z-[999999] items-center justify-center">
+															<XIcon width={12} fill={"white"} />
+														</View>
+														<Image
+															style={{
+																width: 145,
+																height: 148,
+																borderRadius: 10,
+															}}
+															source={image.uri}
+														/>
+													</TouchableOpacity>
+												))}
+											</View>
+										</ScrollView>
 									)}
-									{isSubmitting && !isValidating && <Loader useWhite />}
-								</AppButton>
-							</View>
-						)}
-					</ScrollView>
-					<StructureList
-						sheetRef={structureRef}
-						selectedStructure={values.structureId}
-					/>
-					<PosterList sheetRef={posterRef} selectedPoster={values.posterId} />
-					<IlluminationList
-						sheetRef={illuminationRef}
-						selectedIllumination={values.illuminationId}
-					/>
-					<RouteList sheetRef={routeRef} selectedRouten={values.routeId} />
-					<SideList sheetRef={sideRef} selectedSide={values.sideId} />
-				</View>
-			)}
+
+									<AppButton
+										onPress={() => {
+											const allProvided = Object.values(values).every(
+												(v) => v !== ""
+											);
+
+											if (!allProvided) {
+												Object.keys(values).forEach((k) => {
+													// @ts-ignore
+													if (values[k] === "") {
+														setFieldValue(k, "");
+													}
+												});
+											} else {
+												if (siteImages.length === 0) {
+													showAndHideAlert({
+														message: "Please upload site images.",
+														type: "error",
+													});
+													return;
+												}
+												setShowReview(true);
+											}
+										}}>
+										{!isSubmitting && (
+											<AppText className="text-[17px] text-white">
+												Continue
+											</AppText>
+										)}
+										{isSubmitting && !isValidating && <Loader useWhite />}
+									</AppButton>
+								</View>
+							)}
+						</ScrollView>
+						<StructureList
+							sheetRef={structureRef}
+							selectedStructure={values.structureId}
+						/>
+						<PosterList sheetRef={posterRef} selectedPoster={values.posterId} />
+						<IlluminationList
+							sheetRef={illuminationRef}
+							selectedIllumination={values.illuminationId}
+						/>
+						<RouteList sheetRef={routeRef} selectedRouten={values.routeId} />
+						<SideList sheetRef={sideRef} selectedSide={values.sideId} />
+					</View>
+				)
+			}
 		</Formik>
 	);
 }

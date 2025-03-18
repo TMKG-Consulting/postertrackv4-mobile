@@ -17,15 +17,16 @@ export default function SelectStructure({
 }) {
 	const queryClient = useQueryClient();
 	const [value, setValue] = useState("");
+	const { structures } = useRootStore();
 
 	useEffect(() => {
 		const data = queryClient.getQueryData(["entities", "structures"]);
 
 		if (val !== "") {
 			// @ts-ignore
-			setValue(data?.find((d) => Number(d.id) === Number(val)).name);
+			setValue(structures?.find((d) => Number(d.id) === Number(val)).name);
 		}
-	}, [val]);
+	}, [val, structures]);
 
 	return (
 		<Pressable

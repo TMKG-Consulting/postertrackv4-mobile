@@ -1,11 +1,12 @@
 import AppText from "@/src/components/shared/AppText";
 import BottomSheet from "@/src/components/shared/BottomSheet";
+import useRootStore from "@/src/hooks/stores/useRootstore";
 import ApiInstance from "@/src/utils/api-instance";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { BottomSheetFlashList } from "@gorhom/bottom-sheet";
 import { useQuery } from "@tanstack/react-query";
 import { useFormikContext } from "formik";
-import React from "react";
+import React, { useEffect } from "react";
 import { Pressable, TouchableOpacity, View } from "react-native";
 
 export default function StructureList({
@@ -16,8 +17,9 @@ export default function StructureList({
 	selectedStructure: number | string;
 }) {
 	const { setFieldValue } = useFormikContext();
+	const { setStructures, structures } = useRootStore();
 
-	const { data, isLoading } = useQuery({
+	const { data, isLoading, refetch } = useQuery({
 		queryKey: ["entities", "structures"],
 		queryFn: async () => {
 			const response = await ApiInstance.get("/entities");
@@ -26,15 +28,27 @@ export default function StructureList({
 		gcTime: 0,
 	});
 
+	useEffect(() => {
+		if (data) {
+			setStructures(data);
+		}
+	}, [data, structures]);
+
+	useEffect(() => {
+		if (structures.length === 0 && !isLoading) {
+			refetch();
+		}
+	}, [structures, isLoading]);
+
 	return (
 		<BottomSheet
 			useBackdrop
 			sheetRef={sheetRef}
-			snapPoints={["50%", "50%"]}
+			snapPoints={["50%", "70%"]}
 			snapIndex={0}>
 			<View className=" flex-1">
 				<BottomSheetFlashList
-					data={isLoading ? [] : data}
+					data={isLoading ? [] : structures}
 					estimatedItemSize={200}
 					renderItem={({ item }: { item: { id: number; name: string } }) => (
 						<TouchableOpacity

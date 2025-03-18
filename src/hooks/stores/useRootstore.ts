@@ -28,6 +28,16 @@ type RootStore = {
 	setDisapprovedSites: (val: AuditSite[]) => void;
 	setPendingApprovalSites: (val: PendingApprovalSite[]) => void;
 	setPendingSites: (val: AuditSite[]) => void;
+	structures: { id: number; name: string }[];
+	setStructures: (val: { id: number; name: string }[]) => void;
+	posters: { id: number; name: string }[];
+	setPosters: (val: { id: number; name: string }[]) => void;
+	illumination: { id: number; name: string }[];
+	setIllumination: (val: { id: number; name: string }[]) => void;
+	side: { id: number; name: string }[];
+	setSide: (val: { id: number; name: string }[]) => void;
+	route: { id: number; name: string }[];
+	setRoute: (val: { id: number; name: string }[]) => void;
 };
 
 const RootStore = create<RootStore>()((set) => ({
@@ -58,6 +68,16 @@ const RootStore = create<RootStore>()((set) => ({
 	setAlert: (val) => set((state) => ({ ...state, alert: val })),
 	userDetails: null,
 	setUserDetails: (val) => set((state) => ({ ...state, userDetails: val })),
+	structures: [],
+	setStructures: (val) => set((state) => ({ ...state, structures: val })),
+	posters: [],
+	setPosters: (val) => set((state) => ({ ...state, posters: val })),
+	illumination: [],
+	setIllumination: (val) => set((state) => ({ ...state, illumination: val })),
+	side: [],
+	setSide: (val) => set((state) => ({ ...state, side: val })),
+	route: [],
+	setRoute: (val) => set((state) => ({ ...state, route: val })),
 }));
 
 const useRootStore = () => RootStore((state) => state);
