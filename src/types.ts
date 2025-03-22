@@ -35,3 +35,40 @@ export interface PendingApprovalSite {
 	siteCode: string;
 	status: "pending" | "approved" | "disapproved";
 }
+
+export interface Advertiser {
+	id?: number;
+	name: string;
+}
+
+export interface Category {
+	id?: number;
+	name: string;
+}
+
+export interface Brand {
+	id?: number;
+	name: string;
+	advertiserId: number | string;
+	categoryId: number | string;
+	advertiser?: Advertiser;
+	logo?: string;
+	category?: Category;
+}
+
+export interface State {
+	id?: number;
+	name: string;
+	regionId: number | string;
+}
+
+export interface Region {
+	id?: number;
+	name: string;
+}
+
+export interface City {
+	id?: number;
+	name: string;
+	stateId: number | string;
+}

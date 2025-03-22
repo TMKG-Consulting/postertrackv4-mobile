@@ -1,6 +1,14 @@
 import { create } from "zustand";
 import { StatusBarStyle } from "expo-status-bar";
-import { PendingApprovalSite, User } from "@/src/types";
+import {
+	Advertiser,
+	Brand,
+	Category,
+	City,
+	PendingApprovalSite,
+	State,
+	User,
+} from "@/src/types";
 import { AuditSite } from "@/src/types";
 
 export interface Alert {
@@ -38,6 +46,18 @@ type RootStore = {
 	setSide: (val: { id: number; name: string }[]) => void;
 	route: { id: number; name: string }[];
 	setRoute: (val: { id: number; name: string }[]) => void;
+	brands: Brand[];
+	setBrands: (val: Brand[]) => void;
+	advertisers: Advertiser[];
+	setAdvertisers: (val: Advertiser[]) => void;
+	categories: Category[];
+	setCategories: (val: Category[]) => void;
+	boardTypes: { id: number; name: string }[];
+	setBoardTypes: (val: { id: number; name: string }[]) => void;
+	states: State[];
+	setStates: (val: State[]) => void;
+	cities: City[];
+	setCities: (val: City[]) => void;
 };
 
 const RootStore = create<RootStore>()((set) => ({
@@ -78,6 +98,18 @@ const RootStore = create<RootStore>()((set) => ({
 	setSide: (val) => set((state) => ({ ...state, side: val })),
 	route: [],
 	setRoute: (val) => set((state) => ({ ...state, route: val })),
+	brands: [],
+	setBrands: (val) => set((state) => ({ ...state, brands: val })),
+	advertisers: [],
+	setAdvertisers: (val) => set((state) => ({ ...state, advertisers: val })),
+	categories: [],
+	setCategories: (val) => set((state) => ({ ...state, categories: val })),
+	boardTypes: [],
+	setBoardTypes: (val) => set((state) => ({ ...state, boardTypes: val })),
+	states: [],
+	setStates: (val) => set((state) => ({ ...state, states: val })),
+	cities: [],
+	setCities: (val) => set((state) => ({ ...state, cities: val })),
 }));
 
 const useRootStore = () => RootStore((state) => state);

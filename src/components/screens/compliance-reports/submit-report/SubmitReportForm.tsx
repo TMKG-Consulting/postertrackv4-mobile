@@ -50,7 +50,7 @@ import ApiInstance from "@/src/utils/api-instance";
 import SubmissionReview from "./SubmissionReview";
 import { Modal } from "react-native";
 import CustomImagePicker from "@/src/components/shared/CustomImagePicker";
-import { writeAsync, readAsync } from "@lodev09/react-native-exify";
+import { readAsync } from "@lodev09/react-native-exify";
 
 const schema = Yup.object().shape({
 	siteCode: Yup.string().required().label("Site Code"),

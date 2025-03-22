@@ -62,7 +62,11 @@ export default function HomeScreen() {
 			<AppButton
 				onPress={() => {
 					if (action === "compliance") {
-						router.push("/(main)/compliance-reports");
+						router.replace("/compliance-reports");
+					}
+
+					if (action === "competitive") {
+						router.replace("/competitive-reports");
 					}
 				}}
 				className="mt-[30px]">

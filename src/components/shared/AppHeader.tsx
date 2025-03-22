@@ -52,10 +52,13 @@ export default function AppHeader(props: DrawerHeaderProps) {
 							},
 						]}
 						onPress={() => {
-							if (router.canGoBack()) {
-								router.back();
+							if (
+								pathname === "/competitive-reports" ||
+								pathname === "/compliance-reports"
+							) {
+								router.replace("/home");
 							} else {
-								router.push("/home");
+								router.back();
 							}
 						}}>
 						<View style={{ transform: [{ rotate: "90deg" }] }}>

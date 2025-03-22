@@ -47,7 +47,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
 						</AppText>
 					</Pressable>
 				</Link>
-				<Link href={"/compliance-reports"} asChild>
+				<Link href={"/competitive-reports"} asChild>
 					<Pressable>
 						<AppText className="text-[33px]" weight="ExtraBold">
 							Competitive Reports
